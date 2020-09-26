@@ -1,4 +1,5 @@
-import React, { createRef, useRef, useState } from 'react';
+import React, { useState } from 'react';
+import { PokeAPIPokemon } from '../api-types';
 import { PokemonType } from './Pokemon';
 
 type Props = {
@@ -7,40 +8,50 @@ type Props = {
 
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const endpoint = 'https://pokeapi.co/api/v2/pokemon/';
-    const searchBarRef = createRef<HTMLInputElement>();
-    const [pokemonSprite, setPokemonSprite] = useState<string>('');
-    const [pokemonName, setPokemonName] = useState<string>('');
+    const [query, setQuery] = useState<string>('');
+    const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
+    const [nickname, setNickname] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSearch = async () => {
-        setIsLoading(true);
-        const searchTerm = searchBarRef.current?.value;
-        const repsonse = await (await fetch(`${endpoint}${searchTerm}`)).json();
+    const clearData = () => {
+        setPokemonData(undefined);
+        setNickname('');
+        setQuery('');
+    };
 
-        const sprite = repsonse.sprites.front_default;
-        setPokemonSprite(sprite);
+    const handleSearch = async (searchQuery: string) => {
+        setIsLoading(true);
+
+        const repsonse: PokeAPIPokemon = await (await fetch(`${endpoint}${searchQuery}`)).json();
+
+        setPokemonData(repsonse);
         setIsLoading(false);
     };
 
     const handleAddToParty = () => {
+        if (!pokemonData){
+            throw new Error('Cannot add a pokemon to your party without an API response');
+        }
+
         const pokemon: PokemonType = {
-            name: pokemonName,
-            sprite: pokemonSprite,
+            name: nickname || pokemonData.name,
+            sprite: pokemonData.sprites.front_default,
         };
 
         onAddToParty(pokemon);
+        clearData();
     };
 
-    const isButtonDisabled = !pokemonSprite || !pokemonName || isLoading;
+    const isButtonDisabled = !pokemonData || isLoading;
 
     return (
         <div>
             <div>
-                <input ref={searchBarRef} placeholder="Pokemon to add to party" />
-                <button onClick={() => handleSearch()}>Serach</button>
+                <input value={query} onChange={({ target: { value } }) => setQuery(value)} placeholder="Search for a pokemon" />
+                <button onClick={() => handleSearch(query)}>Search</button>
             </div>
             <div>
-                <input placeholder="Nickname for pokemon" onChange={({ target: { value } }) => setPokemonName(value)} />
+                <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
                 <button onClick={handleAddToParty} disabled={isButtonDisabled}>Add to party</button>
             </div>
         </div>
