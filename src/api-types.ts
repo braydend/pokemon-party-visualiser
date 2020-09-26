@@ -1,8 +1,25 @@
 /**
- * Generated types for the http://pokeapi.co/api/v2/pokemon/{name} API
+ * Generated types for the http://pokeapi.co/api/v2/pokemon API
  * Generated using http://quicktype.io
+ * Response returned from query for all pokemon
  */
+export interface PokeAPIAllPokemon {
+    count:    number;
+    next:     string;
+    previous: null;
+    results:  Result[];
+}
 
+export interface Result {
+    name: string;
+    url:  string;
+}
+
+/**
+ * Generated types for the http://pokeapi.co/api/v2/pokemon/{name | id} API
+ * Generated using http://quicktype.io
+ * Response returned from query for a pokemon by name or id
+ */
 export interface PokeAPIPokemon {
         abilities:                Ability[];
         base_experience:          number;

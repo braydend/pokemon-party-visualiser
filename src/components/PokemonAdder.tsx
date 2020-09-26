@@ -1,28 +1,50 @@
-import React, { useState } from 'react';
-import { PokeAPIPokemon } from '../api-types';
+import React, { useEffect, useState } from 'react';
+import { PokeAPIAllPokemon, PokeAPIPokemon } from '../api-types';
 import { PokemonType } from './Pokemon';
+import ReactSelect from 'react-select';
+
+type SelectOption = {label: string, value: string};
 
 type Props = {
     onAddToParty: (pokemonToAdd: PokemonType) => void;
 };
 
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
-    const endpoint = 'https://pokeapi.co/api/v2/pokemon/';
-    const [query, setQuery] = useState<string>('');
+    const [selectedPokemon, setSelectedPokemon] = useState<SelectOption | null>();
     const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
     const [nickname, setNickname] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const [allPokemon, setAllPokemon] = useState<PokeAPIAllPokemon['results']>([]);
+
+    useEffect(() => {
+        fetchAllPokemon();
+    }, []);
+
+    const fetchAllPokemon = async () => {
+        setIsLoading(true);
+        const endpoint = 'https://pokeapi.co/api/v2/pokemon';
+        const result: PokeAPIAllPokemon = await (await fetch(endpoint)).json();
+
+        setAllPokemon(result.results);
+        setIsLoading(false);
+    };
 
     const clearData = () => {
         setPokemonData(undefined);
         setNickname('');
-        setQuery('');
+        setSelectedPokemon(null);
     };
 
-    const handleSearch = async (searchQuery: string) => {
+    // Couldn't get the type definitions working correctly with react-select
+    // so I have typed it as unkown for now
+    const handleSearch = async (e: unknown) => {
+        if (!e) return;
+        setSelectedPokemon(e as SelectOption);
+        const { value: endpoint } = e as SelectOption;
+
         setIsLoading(true);
 
-        const repsonse: PokeAPIPokemon = await (await fetch(`${endpoint}${searchQuery}`)).json();
+        const repsonse: PokeAPIPokemon = await (await fetch(endpoint)).json();
 
         setPokemonData(repsonse);
         setIsLoading(false);
@@ -42,13 +64,19 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
         clearData();
     };
 
+    const transformPokemonForReactSelect = (pokemon: PokeAPIAllPokemon['results']): SelectOption[] => {
+        if (!pokemon){
+            return [];
+        }
+        return pokemon.map(({ name, url}) => ({ label: name, value: url }));
+    };
+
     const isButtonDisabled = !pokemonData || isLoading;
 
     return (
         <div>
             <div>
-                <input value={query} onChange={({ target: { value } }) => setQuery(value)} placeholder="Search for a pokemon" />
-                <button onClick={() => handleSearch(query)}>Search</button>
+                <ReactSelect value={selectedPokemon} options={transformPokemonForReactSelect(allPokemon)} isDisabled={!allPokemon} onChange={handleSearch}  />
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
