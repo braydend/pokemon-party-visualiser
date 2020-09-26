@@ -1,4 +1,4 @@
-import React, { createRef, useState } from 'react';
+import React, { useState } from 'react';
 import { PokeAPIPokemon } from '../api-types';
 import { PokemonType } from './Pokemon';
 
@@ -8,21 +8,21 @@ type Props = {
 
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const endpoint = 'https://pokeapi.co/api/v2/pokemon/';
-    const searchBarRef = createRef<HTMLInputElement>();
+    const [query, setQuery] = useState<string>('');
     const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
     const [nickname, setNickname] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
 
     const clearData = () => {
         setPokemonData(undefined);
-        setNickname(undefined)
+        setNickname(undefined);
+        setQuery('');
     };
 
-    const handleSearch = async () => {
+    const handleSearch = async (searchQuery: string) => {
         setIsLoading(true);
-        
-        const searchTerm = searchBarRef.current?.value;
-        const repsonse: PokeAPIPokemon = await (await fetch(`${endpoint}${searchTerm}`)).json();
+
+        const repsonse: PokeAPIPokemon = await (await fetch(`${endpoint}${searchQuery}`)).json();
 
         setPokemonData(repsonse);
         setIsLoading(false);
@@ -47,8 +47,8 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     return (
         <div>
             <div>
-                <input ref={searchBarRef} placeholder="Search for a pokemon" />
-                <button onClick={() => handleSearch()}>Search</button>
+                <input value={query} onChange={({ target: { value } }) => setQuery(value)} placeholder="Search for a pokemon" />
+                <button onClick={() => handleSearch(query)}>Search</button>
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} />
