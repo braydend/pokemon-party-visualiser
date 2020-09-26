@@ -10,12 +10,12 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const endpoint = 'https://pokeapi.co/api/v2/pokemon/';
     const [query, setQuery] = useState<string>('');
     const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
-    const [nickname, setNickname] = useState<string>();
+    const [nickname, setNickname] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
 
     const clearData = () => {
         setPokemonData(undefined);
-        setNickname(undefined);
+        setNickname('');
         setQuery('');
     };
 
@@ -51,7 +51,7 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
                 <button onClick={() => handleSearch(query)}>Search</button>
             </div>
             <div>
-                <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} />
+                <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
                 <button onClick={handleAddToParty} disabled={isButtonDisabled}>Add to party</button>
             </div>
         </div>
