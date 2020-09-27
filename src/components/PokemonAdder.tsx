@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PokeAPIAllPokemon, PokeAPIPokemon } from '../api-types';
 import { PokemonType } from './Pokemon';
 import ReactSelect from 'react-select';
+import { useGetAllPokemon } from '../hooks/PokeApi';
 
 type SelectOption = {label: string, value: string};
 
@@ -14,20 +15,7 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
     const [nickname, setNickname] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
-    const [allPokemon, setAllPokemon] = useState<PokeAPIAllPokemon['results']>([]);
-
-    useEffect(() => {
-        fetchAllPokemon();
-    }, []);
-
-    const fetchAllPokemon = async () => {
-        setIsLoading(true);
-        const endpoint = 'https://pokeapi.co/api/v2/pokemon';
-        const result: PokeAPIAllPokemon = await (await fetch(endpoint)).json();
-
-        setAllPokemon(result.results);
-        setIsLoading(false);
-    };
+    const { data: allPokemon, loading } = useGetAllPokemon();
 
     const clearData = () => {
         setPokemonData(undefined);
@@ -71,12 +59,14 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
         return pokemon.map(({ name, url}) => ({ label: name, value: url }));
     };
 
-    const isButtonDisabled = !pokemonData || isLoading;
+    const isButtonDisabled = !pokemonData || isLoading || loading;
+
+    const allPokemonOptions = allPokemon && transformPokemonForReactSelect(allPokemon);
 
     return (
         <div>
             <div>
-                <ReactSelect value={selectedPokemon} options={transformPokemonForReactSelect(allPokemon)} isDisabled={!allPokemon} onChange={handleSearch}  />
+                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch}  />
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
