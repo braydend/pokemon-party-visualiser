@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { PokeAPIAllPokemon, PokeAPIPokemon } from '../api-types';
+import React, { useState } from 'react';
+import { PokemonListing } from '../api-types';
 import { PokemonType } from './Pokemon';
 import ReactSelect from 'react-select';
+import { useGetAllPokemon, useGetPokemonData } from '../hooks/PokeApi';
 
 type SelectOption = {label: string, value: string};
 
@@ -11,26 +12,11 @@ type Props = {
 
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const [selectedPokemon, setSelectedPokemon] = useState<SelectOption | null>();
-    const [pokemonData, setPokemonData] = useState<PokeAPIPokemon>();
     const [nickname, setNickname] = useState<string>('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [allPokemon, setAllPokemon] = useState<PokeAPIAllPokemon['results']>([]);
-
-    useEffect(() => {
-        fetchAllPokemon();
-    }, []);
-
-    const fetchAllPokemon = async () => {
-        setIsLoading(true);
-        const endpoint = 'https://pokeapi.co/api/v2/pokemon';
-        const result: PokeAPIAllPokemon = await (await fetch(endpoint)).json();
-
-        setAllPokemon(result.results);
-        setIsLoading(false);
-    };
+    const { data: allPokemon, loading: pokedexLoading } = useGetAllPokemon();
+    const [fetchPokemon, { data: pokemonData, loading: pokemonLoading }] = useGetPokemonData();
 
     const clearData = () => {
-        setPokemonData(undefined);
         setNickname('');
         setSelectedPokemon(null);
     };
@@ -40,14 +26,8 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const handleSearch = async (e: unknown) => {
         if (!e) return;
         setSelectedPokemon(e as SelectOption);
-        const { value: endpoint } = e as SelectOption;
-
-        setIsLoading(true);
-
-        const repsonse: PokeAPIPokemon = await (await fetch(endpoint)).json();
-
-        setPokemonData(repsonse);
-        setIsLoading(false);
+        const { value: name } = e as SelectOption;
+        fetchPokemon(name);
     };
 
     const handleAddToParty = () => {
@@ -64,19 +44,21 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
         clearData();
     };
 
-    const transformPokemonForReactSelect = (pokemon: PokeAPIAllPokemon['results']): SelectOption[] => {
+    const transformPokemonForReactSelect = (pokemon: PokemonListing[]): SelectOption[] => {
         if (!pokemon){
             return [];
         }
-        return pokemon.map(({ name, url}) => ({ label: name, value: url }));
+        return pokemon.map(({ name }) => ({ label: name, value: name }));
     };
 
-    const isButtonDisabled = !pokemonData || isLoading;
+    const isButtonDisabled = pokemonLoading || pokedexLoading;
+
+    const allPokemonOptions = allPokemon && transformPokemonForReactSelect(allPokemon);
 
     return (
         <div>
             <div>
-                <ReactSelect value={selectedPokemon} options={transformPokemonForReactSelect(allPokemon)} isDisabled={!allPokemon} onChange={handleSearch}  />
+                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch}  />
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />

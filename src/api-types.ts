@@ -7,10 +7,10 @@ export interface PokeAPIAllPokemon {
     count:    number;
     next:     string;
     previous: null;
-    results:  Result[];
+    results:  PokemonListing[];
 }
 
-export interface Result {
+export interface PokemonListing {
     name: string;
     url:  string;
 }
