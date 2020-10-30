@@ -8,21 +8,14 @@ export type PokemonType = {
 };
 
 const Container = styled.div`
-    /* border-radius: 50%; */
     padding: 1rem;
+    flex-grow: 1;
+    background-color: #474e5c;
+    border-radius: 6px;
+    margin: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-`;
-
-const Placeholder = styled.img`
-    width: 100%;
-    height: auto;
-`;
-
-const PokemonImage = styled.img`
-    width: 200%;
-    height: auto;
 `;
 
  type Props = {
@@ -31,21 +24,14 @@ const PokemonImage = styled.img`
  };
 
 const Pokemon: React.FC<Props> = ({ pokemon, onRelease }) => {
-    const isPokemon = pokemon !== null;
-
-    if (!isPokemon) return (
-        <Container>
-            <p>Catch something!</p>
-            <Placeholder src={pokeballImage} alt="pokeball" />
-        </Container>
-    );
-
-    const { name, sprite } = pokemon as PokemonType;
+    const image = pokemon?.sprite || pokeballImage;
+    const text = pokemon?.name || 'Catch something!';
+    const altText = pokemon?.name ? `Image for ${pokemon.name}` : 'Pokeball';
 
     return (
     <Container>
-        <p>{name}</p>
-        <PokemonImage src={sprite} alt={`Image for ${name}`} />
+        <p>{text}</p>
+        <img src={image} width={150} alt={altText} />
         <button onClick={onRelease}>Release!</button>
     </Container>
     );
