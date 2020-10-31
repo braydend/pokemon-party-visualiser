@@ -8,21 +8,17 @@ export type PokemonType = {
 };
 
 const Container = styled.div`
-    /* border-radius: 50%; */
+    // Created with: https://neumorphism.io/#474e5c
+    border-radius: 30px;
+    background: #474e5c;
+    box-shadow: inset 6px 6px 12px #363b46, 
+                inset -6px -6px 12px #586172;
     padding: 1rem;
+    flex-grow: 1;
+    margin: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-`;
-
-const Placeholder = styled.img`
-    width: 100%;
-    height: auto;
-`;
-
-const PokemonImage = styled.img`
-    width: 200%;
-    height: auto;
 `;
 
  type Props = {
@@ -32,21 +28,15 @@ const PokemonImage = styled.img`
 
 const Pokemon: React.FC<Props> = ({ pokemon, onRelease }) => {
     const isPokemon = pokemon !== null;
-
-    if (!isPokemon) return (
-        <Container>
-            <p>Catch something!</p>
-            <Placeholder src={pokeballImage} alt="pokeball" />
-        </Container>
-    );
-
-    const { name, sprite } = pokemon as PokemonType;
+    const image = pokemon?.sprite || pokeballImage;
+    const text = pokemon?.name || 'Catch something!';
+    const altText = pokemon?.name ? `Image for ${pokemon.name}` : 'Pokeball';
 
     return (
     <Container>
-        <p>{name}</p>
-        <PokemonImage src={sprite} alt={`Image for ${name}`} />
-        <button onClick={onRelease}>Release!</button>
+        <p>{text}</p>
+        <img src={image} width={150} alt={altText} />
+        {isPokemon && <button onClick={onRelease}>Release!</button>}
     </Container>
     );
 };

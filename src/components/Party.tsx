@@ -11,12 +11,19 @@ const Container = styled.div`
     display: flex;
     justify-content: space-around;
     flex-direction: row;
+    @media screen and (max-width: 1300px) {
+        flex-wrap: wrap;
+    }
 `;
 
 const Party: React.FC<Props> = ({ pokemon, handleRelease }) => {
-    return <Container>
-        {pokemon.map(pokemon => <Pokemon onRelease={() => pokemon === null ? {} : handleRelease(pokemon)} pokemon={pokemon} />)}
-    </Container>;
+    return (
+        <Container>
+            {pokemon.map(pokemon => (
+                <Pokemon onRelease={() => pokemon === null ? {} : handleRelease(pokemon)} pokemon={pokemon} />
+            ))}
+        </Container>
+    );
 };
 
 export default Party;
