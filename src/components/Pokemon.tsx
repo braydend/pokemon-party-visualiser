@@ -8,10 +8,13 @@ export type PokemonType = {
 };
 
 const Container = styled.div`
+    // Created with: https://neumorphism.io/#474e5c
+    border-radius: 30px;
+    background: #474e5c;
+    box-shadow: inset 6px 6px 12px #363b46, 
+                inset -6px -6px 12px #586172;
     padding: 1rem;
     flex-grow: 1;
-    background-color: #474e5c;
-    border-radius: 6px;
     margin: 1rem;
     display: flex;
     flex-direction: column;
@@ -24,6 +27,7 @@ const Container = styled.div`
  };
 
 const Pokemon: React.FC<Props> = ({ pokemon, onRelease }) => {
+    const isPokemon = pokemon !== null;
     const image = pokemon?.sprite || pokeballImage;
     const text = pokemon?.name || 'Catch something!';
     const altText = pokemon?.name ? `Image for ${pokemon.name}` : 'Pokeball';
@@ -32,7 +36,7 @@ const Pokemon: React.FC<Props> = ({ pokemon, onRelease }) => {
     <Container>
         <p>{text}</p>
         <img src={image} width={150} alt={altText} />
-        <button onClick={onRelease}>Release!</button>
+        {isPokemon && <button onClick={onRelease}>Release!</button>}
     </Container>
     );
 };
