@@ -4,6 +4,7 @@ import { PokemonType } from './Pokemon';
 import ReactSelect, { Styles } from 'react-select';
 import { useGetAllPokemon, useGetPokemonData } from '../hooks/PokeApi';
 import { Maybe, Nullable } from '../utils';
+import styled from 'styled-components';
 
 type SelectOption = { label: string, value: string };
 
@@ -22,6 +23,26 @@ const selectStyles: Partial<Styles> = {
         borderRadius: 3,
     }),
 };
+
+const Container = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    @media screen and (max-width: 800px) {
+        grid-template-columns: 1fr;
+    }
+    gap: 1em;
+`;
+
+const Input = styled.input`
+    font-size: inherit;
+    padding: 0.25rem;
+    border-radius: 4px;
+`;
+const Button = styled.button`
+    font-size: inherit;
+    padding: 0.25rem;
+    border-radius: 4px;
+`;
 
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const [selectedPokemon, setSelectedPokemon] = useState<Nullable<Maybe<SelectOption>>>();
@@ -69,15 +90,15 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     const allPokemonOptions = allPokemon && transformPokemonForReactSelect(allPokemon);
 
     return (
-        <div>
+        <Container>
             <div>
                 <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch} placeholder="Search..." styles={selectStyles}  />
             </div>
             <div>
-                <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
-                <button onClick={handleAddToParty} disabled={isButtonDisabled}>Add to party</button>
+                <Input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
+                <Button onClick={handleAddToParty} disabled={isButtonDisabled}>Add to party</Button>
             </div>
-        </div>
+        </Container>
     );
 };
 
