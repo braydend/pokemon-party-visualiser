@@ -8,11 +8,16 @@ type Props = {
 };
 
 const Container = styled.div`
-    display: flex;
-    justify-content: space-around;
-    flex-direction: row;
-    @media screen and (max-width: 1300px) {
-        flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    @media screen and (max-width: 400px) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    @media screen and (min-width: 400px) and (max-width: 800px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @media screen and (min-width: 800px) and (max-width: 1300px) {
+        grid-template-columns: repeat(3, 1fr);
     }
 `;
 
