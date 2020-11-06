@@ -71,7 +71,7 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     return (
         <div>
             <div>
-                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch} styles={selectStyles}  />
+                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch} placeholder="Search..." styles={selectStyles}  />
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />
