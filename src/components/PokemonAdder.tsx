@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 import { PokemonListing } from '../api-types';
 import { PokemonType } from './Pokemon';
-import ReactSelect from 'react-select';
+import ReactSelect, { Styles } from 'react-select';
 import { useGetAllPokemon, useGetPokemonData } from '../hooks/PokeApi';
+import { Maybe, Nullable } from '../utils';
 
-type SelectOption = {label: string, value: string};
+type SelectOption = { label: string, value: string };
 
 type Props = {
     onAddToParty: (pokemonToAdd: PokemonType) => void;
 };
 
+const selectStyles: Partial<Styles> = {
+    option: (provided, { isFocused }) => ({
+        ...provided,
+        backgroundColor: isFocused ? '#474e5c' : '#2d3138',
+    }),
+    menuList: (provided) => ({
+        ...provided,
+        backgroundColor: '#2d3138',
+        borderRadius: 3,
+    }),
+};
+
 const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
-    const [selectedPokemon, setSelectedPokemon] = useState<SelectOption | null>();
+    const [selectedPokemon, setSelectedPokemon] = useState<Nullable<Maybe<SelectOption>>>();
     const [nickname, setNickname] = useState<string>('');
     const { data: allPokemon, loading: pokedexLoading } = useGetAllPokemon();
     const [fetchPokemon, { data: pokemonData, loading: pokemonLoading }] = useGetPokemonData();
@@ -22,7 +35,7 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
     };
 
     // Couldn't get the type definitions working correctly with react-select
-    // so I have typed it as unkown for now
+    // so I have typed it as unknown for now
     const handleSearch = async (e: unknown) => {
         if (!e) return;
         setSelectedPokemon(e as SelectOption);
@@ -51,14 +64,14 @@ const PokemonAdder: React.FC<Props> = ({ onAddToParty }) => {
         return pokemon.map(({ name }) => ({ label: name, value: name }));
     };
 
-    const isButtonDisabled = pokemonLoading || pokedexLoading;
+    const isButtonDisabled = pokemonLoading || pokedexLoading || !selectedPokemon;
 
     const allPokemonOptions = allPokemon && transformPokemonForReactSelect(allPokemon);
 
     return (
         <div>
             <div>
-                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch}  />
+                <ReactSelect value={selectedPokemon} options={allPokemonOptions} isDisabled={!allPokemon} onChange={handleSearch} styles={selectStyles}  />
             </div>
             <div>
                 <input placeholder="Nickname" onChange={({ target: { value } }) => setNickname(value)} value={nickname} />

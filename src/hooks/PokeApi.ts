@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { PokeAPIAllPokemon, PokeAPIPokemon, PokemonListing } from "../api-types";
+import { Maybe } from "../utils";
 
-type Maybe<T> = T | undefined;
 type Error = {
     message: string;
 };
